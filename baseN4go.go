@@ -3,6 +3,7 @@ package baseN4go
 import "math"
 import "errors"
 import "strings"
+import "fmt"
 
 //utf8
 var defaultBase = []string{
@@ -21,14 +22,33 @@ type BaseN struct {
 	radix int8
 }
 
-func NewBaseN(radix int8) (error, *BaseN) {
-	if radix > 62 || radix < 2 {
-		return errors.New("rror param: if the param is numeric, it must be between 2 and 62."), nil
-	}
+func NewBaseN(param interface {}) (error, *BaseN) {
+	var baseN *BaseN
 
-	baseN := &BaseN{
-		base:  defaultBase[0:radix],
-		radix: radix,
+	switch paramType:= param.(type){
+	case int8:
+		a := param.(int8)
+		if a > 62 || a < 2 {
+			return errors.New("error param: if the param is numeric, it must be between 2 and 62."), nil
+		}
+		baseN = &BaseN{
+			base:  defaultBase[0:a],
+			radix: a,
+		}
+
+	case []string:
+		b := param.([]string)
+		radix := len(b)
+		if radix > 62 || radix < 2 {
+			return errors.New("error param: if the type of param is []string, it's length must be between 2 and 62."), nil
+		}
+		baseN = &BaseN{
+			base:  b,
+			radix: int8(radix),
+		}
+	default:
+		fmt.Println("illegel param type: ", paramType)
+		return errors.New("error param type: param must be int8(2~62) or []string(length:2~62)"), nil
 	}
 
 	return nil, baseN
