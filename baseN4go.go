@@ -1,12 +1,8 @@
-package main
+package baseN4go
 
-import "fmt"
 import "math"
 import "errors"
-
-func Test(str string) {
-	fmt.Println("just test...", str)
-}
+import "strings"
 
 //utf8
 var defaultBase = []string{
@@ -17,7 +13,7 @@ var defaultBase = []string{
 	"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 
 const (
-	maxNum = math.MaxInt64 // int64(1<<63 - 1)
+	maxNum = math.MaxInt64 // int64(1<<63 - 1
 )
 
 type BaseN struct {
@@ -25,7 +21,7 @@ type BaseN struct {
 	radix int8
 }
 
-func New(radix int8) (error, *BaseN) {
+func NewBaseN(radix int8) (error, *BaseN) {
 	if radix > 62 || radix < 2 {
 		return errors.New("rror param: if the param is numeric, it must be between 2 and 62."), nil
 	}
@@ -38,9 +34,9 @@ func New(radix int8) (error, *BaseN) {
 	return nil, baseN
 }
 
-func (this *BaseN) encode(num int64) string {
+func (this *BaseN) encode(num int64) (error, string) {
 	if num > maxNum {
-		return "-"
+		return errors.New("input param is bigger than maxNum(1<<63-1)"), ""
 	}
 
 	var tmp string
@@ -48,15 +44,15 @@ func (this *BaseN) encode(num int64) string {
 	var negative = false
 
 	if num == 0 {
-		return this.base[0]
+		return nil, this.base[0]
 	}
 	if num < 0 {
 		negative = true
-		num = num * (-1)
+		num = num*(-1)
 	}
 
 	for num > 0 {
-		tmp += this.base[int8(num%int64(this.radix))]
+		tmp += this.base[int8(num % int64(this.radix))]
 		num = int64(num / int64(this.radix))
 	}
 
@@ -65,18 +61,37 @@ func (this *BaseN) encode(num int64) string {
 	}
 
 	if negative {
-		result = "-" + result
+		result = "-"+result
 	}
-	return result
+	return nil, result
 }
 
-func main() {
-	fmt.Println(maxNum)
-	fmt.Println(defaultBase)
-	_, base := New(2)
-	for i := 0; i < 20; i++ {
-		fmt.Println(base.encode(int64(i)))
-		fmt.Println(base.encode(int64(-i)))
+func (this *BaseN) decode(str string) (error, int64) {
+	var result int64
+	var negative int64 = 1
+
+	if strings.HasPrefix(str, "-") {
+		negative = -1
+		str = str[1:]
 	}
 
+	for index := 0; index < len(str); index++ {
+		c := string(str[index])
+		tableIndex := 0
+		for i := 0; i < len(this.base); i++ {
+			if string(this.base[i]) == c {
+				tableIndex = i
+				break
+			}
+		}
+
+		var tmp, radix int64 = 1, int64(this.radix)
+		for j := len(str) - index - 1; j > 0; j-- {
+			tmp = tmp*radix
+		}
+		result += int64(tableIndex)*tmp
+	}
+
+	return nil, result*negative
 }
+
