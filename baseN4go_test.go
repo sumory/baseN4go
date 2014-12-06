@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 	"strconv"
+	. "github.com/smartystreets/goconvey"
 )
 
 func TestRadix8(t *testing.T) {

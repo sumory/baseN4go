@@ -54,7 +54,7 @@ func NewBaseN(param interface {}) (error, *BaseN) {
 	return nil, baseN
 }
 
-func (this *BaseN) encode(num int64) (error, string) {
+func (this *BaseN) Encode(num int64) (error, string) {
 	if num > maxNum {
 		return errors.New("input param is bigger than maxNum(1<<63-1)"), ""
 	}
@@ -86,7 +86,7 @@ func (this *BaseN) encode(num int64) (error, string) {
 	return nil, result
 }
 
-func (this *BaseN) decode(str string) (error, int64) {
+func (this *BaseN) Decode(str string) (error, int64) {
 	var result int64
 	var negative int64 = 1
 
