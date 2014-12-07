@@ -19,15 +19,42 @@ const (
 
 type BaseN struct {
 	base  []string
-	radix int8
+	radix int64
 }
 
 func NewBaseN(param interface {}) (error, *BaseN) {
 	var baseN *BaseN
 
 	switch paramType:= param.(type){
+	case int:
+		a := int64(param.(int))
+		if a > 62 || a < 2 {
+			return errors.New("error param: if the param is numeric, it must be between 2 and 62."), nil
+		}
+		baseN = &BaseN{
+			base:  defaultBase[0:a],
+			radix: a,
+		}
+	case int32:
+		a := int64(param.(int32))
+		if a > 62 || a < 2 {
+			return errors.New("error param: if the param is numeric, it must be between 2 and 62."), nil
+		}
+		baseN = &BaseN{
+			base:  defaultBase[0:a],
+			radix: a,
+		}
+	case int64:
+		a := param.(int64)
+		if a > 62 || a < 2 {
+			return errors.New("error param: if the param is numeric, it must be between 2 and 62."), nil
+		}
+		baseN = &BaseN{
+			base:  defaultBase[0:a],
+			radix: a,
+		}
 	case int8:
-		a := param.(int8)
+		a := int64(param.(int8))
 		if a > 62 || a < 2 {
 			return errors.New("error param: if the param is numeric, it must be between 2 and 62."), nil
 		}
@@ -44,7 +71,7 @@ func NewBaseN(param interface {}) (error, *BaseN) {
 		}
 		baseN = &BaseN{
 			base:  b,
-			radix: int8(radix),
+			radix: int64(radix),
 		}
 	default:
 		fmt.Println("illegel param type: ", paramType)
@@ -97,19 +124,19 @@ func (this *BaseN) Decode(str string) (error, int64) {
 
 	for index := 0; index < len(str); index++ {
 		c := string(str[index])
-		tableIndex := 0
-		for i := 0; i < len(this.base); i++ {
+		var tableIndex,i int64
+		for i=0; i < this.radix; i++ {
 			if string(this.base[i]) == c {
 				tableIndex = i
 				break
 			}
 		}
 
-		var tmp, radix int64 = 1, int64(this.radix)
+		var tmp int64 = 1
 		for j := len(str) - index - 1; j > 0; j-- {
-			tmp = tmp*radix
+			tmp = tmp*this.radix
 		}
-		result += int64(tableIndex)*tmp
+		result += tableIndex*tmp
 	}
 
 	return nil, result*negative

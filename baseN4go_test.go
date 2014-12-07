@@ -1,39 +1,51 @@
 package baseN4go
 
 import (
-	"fmt"
 	"testing"
+	convey "github.com/smartystreets/goconvey/convey"
+
 	"strconv"
 )
 
-func TestRadix8(t *testing.T) {
-	test(8, 0, 1<<10, t)
-}
-
-func TestRadix16(t *testing.T) {
-	test(16, 1<<15, 1<<20, t)
-}
-
-func TestRadix62(t *testing.T) {
-	test(62, 1<<30-10000, 1<<30, t)
+func test(name string, radix int8, testMinNum int64, testMaxNum int64, t *testing.T) {
+	convey.Convey(name, t, func() {
+			_, baseN := NewBaseN(radix)
+			//convey.So(err, convey.ShouldBeNil)
+			var i int64
+			for i = testMinNum; i < testMaxNum; i++ {
+				err, encodeResult := baseN.Encode(i)
+				//convey.So(err, convey.ShouldBeNil)
+				err, decodeResult := baseN.Decode(encodeResult)
+				convey.So(err, convey.ShouldBeNil)
+				convey.So(decodeResult, convey.ShouldEqual, int64(i))
+			}
+		})
 }
 
 func TestRadix2(t *testing.T) {
-	test(2, 1<<60-10000, 1<<60, t)
+	test("test radix 2", 2, 0, 1<<10, t)
+}
+
+func TestRadix8(t *testing.T) {
+	test("test radix 8", 8, 0, 1<<10, t)
 }
 
 func TestRadix10(t *testing.T) {
-	test(10, 1<<63-1<<10, 1<<63-1, t)
+	test("test radix 10", 10, 1<<16-100, 1<<16, t)
 }
 
-/*
-* 注意ParseUint与ParseInt、uint64和int64对测试的影响
-*/
-func TestRadix16_Stand(t *testing.T) {
-	fmt.Println("TestRadix16WithHex...")
-	err, base := NewBaseN(int8(16))
+func TestRadix16(t *testing.T) {
+	test("test radix 16", 16, 1<<16-100, 1<<16, t)
+}
 
-	//warning...
+func TestRadix62(t *testing.T) {
+	test("test radix 62", 62, 1<<16-100, 1<<16, t)
+}
+
+
+func TestRadix16_Stand(t *testing.T) {
+
+	//warning...注意ParseUint与ParseInt、uint64和int64对测试的影响
 	//	v1, _ := strconv.ParseUint("200", 16, 10)
 	//	fmt.Println(v1)
 	//
@@ -52,111 +64,69 @@ func TestRadix16_Stand(t *testing.T) {
 	//	v6, _ := strconv.ParseInt("1fe", 16, 10)
 	//	fmt.Println(v6)
 
-	if err != nil {
-		fmt.Println("can not initialize a new BaseN4go instance")
-	} else {
-		for i := 0; i < 1<<10; i++ {
-			err, encodeResult := base.Encode(int64(i))
-			if err != nil {
-				t.FailNow()
-			} else {
+	convey.Convey("should equal with srtconv.ParseUnit result", t, func() {
+			err, baseN := NewBaseN(int8(16))
+			convey.So(err, convey.ShouldBeNil)
+			var i int64
+			for i = 0; i < 1024; i++ {
+				_, encodeResult := baseN.Encode(i)
 				value, e := strconv.ParseUint(encodeResult, 16, 10)
-
-				if e != nil {
-					fmt.Println(i, encodeResult, value)
-					t.FailNow()
-				}
-				if value != uint64(i) {
-					fmt.Println(i, encodeResult, value)
-					t.FailNow()
-				}
+				convey.So(e, convey.ShouldBeNil)
+				convey.So(value, convey.ShouldEqual, i)
 			}
-		}
-	}
+		})
+}
+
+func TestConstructor(t *testing.T) {
+	convey.Convey("constructor should be right",t, func(){
+			err, _ := NewBaseN([]string{"a", "b", "c", "d"})
+			convey.So(err, convey.ShouldBeNil)
+			err, _ = NewBaseN(4)
+			convey.So(err, convey.ShouldBeNil)
+			err, _ = NewBaseN(int(4))
+			convey.So(err, convey.ShouldBeNil)
+			err, _ = NewBaseN(int8(4))
+			convey.So(err, convey.ShouldBeNil)
+
+			err, _ = NewBaseN(int32(4))
+			convey.So(err, convey.ShouldBeNil)
+			err, _ = NewBaseN(int64(4))
+			convey.So(err, convey.ShouldBeNil)
+		})
+
+	convey.Convey("constructor should be wrong",t, func(){
+			err, _ := NewBaseN([]string{
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+			"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+			"p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+			"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+			"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+			"-","+"})
+			convey.So(err, convey.ShouldNotBeNil)
+
+
+			err, _ = NewBaseN(63)
+			convey.So(err, convey.ShouldNotBeNil)
+			err, _ = NewBaseN(1)
+			convey.So(err, convey.ShouldNotBeNil)
+
+			err, _ = NewBaseN(int8(63))
+			convey.So(err, convey.ShouldNotBeNil)
+			err, _ = NewBaseN(int32(1))
+			convey.So(err, convey.ShouldNotBeNil)
+
+			err, _ = NewBaseN(int(63))
+			convey.So(err, convey.ShouldNotBeNil)
+			err, _ = NewBaseN(int64(1))
+			convey.So(err, convey.ShouldNotBeNil)
+
+
+			err, baseN := NewBaseN(0)
+			convey.So(err, convey.ShouldNotBeNil)
+			convey.So(baseN,convey.ShouldBeNil)
+		})
+
 }
 
 
 
-
-func TestNewBaseN(t *testing.T) {
-	err, baseN := NewBaseN([]string{"a", "b", "c", "d"})
-	if err != nil {
-		t.Log("can not initialize a BaseN4go instance", err)
-		t.FailNow()
-	} else {
-		testConstructor("TestNewBaseN", baseN, t)
-	}
-}
-
-func TestNewNewBaseN(t *testing.T) {
-	err, baseN := NewBaseN(int8(4))
-	if err != nil {
-		t.Log("can not initialize a new BaseN4go instance", err)
-		t.FailNow()
-	} else {
-		testConstructor("TestNewNewBaseN", baseN, t)
-	}
-}
-
-// ~================ public methods ==============================================
-
-func test(radix int8, testMinNum int64, testMaxNum int64, t *testing.T) {
-	//runtime.GOMAXPROCS(runtime.NumCPU())
-
-	t.Log("Test:", radix, testMinNum, testMaxNum)
-	err, base := NewBaseN(radix)
-
-	if err != nil {
-		fmt.Println("can not initialize a new BaseN4go instance")
-	} else {
-		for i := testMinNum; i < testMaxNum; i++ {
-			//fmt.Print("origin is ", i)
-			err, encodeResult := base.Encode(int64(i))
-			if err != nil {
-				//fmt.Println("error when encoding..."
-				t.FailNow()
-			} else {
-				//fmt.Print("    encode is ", encodeResult)
-				err2, decodeResult := base.Decode(encodeResult)
-				if err2 != nil {
-					//fmt.Println("error when decoding...")
-
-				}else {
-					if decodeResult == int64(i) {
-						//fmt.Print("    decode is ", decodeResult)
-					}else {
-						fmt.Print("decode is equal encode ", i, encodeResult, decodeResult)
-						t.Fail()
-					}
-				}
-			}
-			//fmt.Println()
-		}
-	}
-}
-
-func testConstructor(name string, baseN *BaseN, t *testing.T) {
-	t.Log(name)
-	for i := 0; i < 2<<10; i++ {
-		//fmt.Print("origin is ", i)
-		err, encodeResult := baseN.Encode(int64(i))
-		if err != nil {
-			//fmt.Println("error when encoding..."
-			t.FailNow()
-		} else {
-			//fmt.Print("    encode is ", encodeResult)
-			err2, decodeResult := baseN.Decode(encodeResult)
-			if err2 != nil {
-				t.Fail()
-			}else {
-				if decodeResult == int64(i) {
-					//t.Log(i, encodeResult, decodeResult)
-				}else {
-					fmt.Print("decode is not equal to encode ", i, encodeResult, decodeResult)
-					t.Fail()
-				}
-			}
-		}
-		//fmt.Println()
-	}
-}
