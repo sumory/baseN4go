@@ -124,8 +124,11 @@ func TestConstructor(t *testing.T) {
 			err, baseN := NewBaseN(0)
 			convey.So(err, convey.ShouldNotBeNil)
 			convey.So(baseN,convey.ShouldBeNil)
-		})
 
+			err, baseN = NewBaseN("abc")
+			convey.So(err, convey.ShouldNotBeNil)
+			convey.So(baseN,convey.ShouldBeNil)
+		})
 }
 
 
