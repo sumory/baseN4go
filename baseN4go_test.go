@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 	"strconv"
-	. "github.com/smartystreets/goconvey"
 )
 
 func TestRadix8(t *testing.T) {
@@ -12,15 +11,15 @@ func TestRadix8(t *testing.T) {
 }
 
 func TestRadix16(t *testing.T) {
-	test(16, 1<<10, 1<<20, t)
+	test(16, 1<<15, 1<<20, t)
 }
 
 func TestRadix62(t *testing.T) {
-	test(62, 1<<30-100000, 1<<30, t)
+	test(62, 1<<30-10000, 1<<30, t)
 }
 
 func TestRadix2(t *testing.T) {
-	test(2, 1<<60-100000, 1<<60, t)
+	test(2, 1<<60-10000, 1<<60, t)
 }
 
 func TestRadix10(t *testing.T) {
@@ -57,7 +56,7 @@ func TestRadix16_Stand(t *testing.T) {
 		fmt.Println("can not initialize a new BaseN4go instance")
 	} else {
 		for i := 0; i < 1<<10; i++ {
-			err, encodeResult := base.encode(int64(i))
+			err, encodeResult := base.Encode(int64(i))
 			if err != nil {
 				t.FailNow()
 			} else {
@@ -112,13 +111,13 @@ func test(radix int8, testMinNum int64, testMaxNum int64, t *testing.T) {
 	} else {
 		for i := testMinNum; i < testMaxNum; i++ {
 			//fmt.Print("origin is ", i)
-			err, encodeResult := base.encode(int64(i))
+			err, encodeResult := base.Encode(int64(i))
 			if err != nil {
 				//fmt.Println("error when encoding..."
 				t.FailNow()
 			} else {
 				//fmt.Print("    encode is ", encodeResult)
-				err2, decodeResult := base.decode(encodeResult)
+				err2, decodeResult := base.Decode(encodeResult)
 				if err2 != nil {
 					//fmt.Println("error when decoding...")
 
@@ -140,13 +139,13 @@ func testConstructor(name string, baseN *BaseN, t *testing.T) {
 	t.Log(name)
 	for i := 0; i < 2<<10; i++ {
 		//fmt.Print("origin is ", i)
-		err, encodeResult := baseN.encode(int64(i))
+		err, encodeResult := baseN.Encode(int64(i))
 		if err != nil {
 			//fmt.Println("error when encoding..."
 			t.FailNow()
 		} else {
 			//fmt.Print("    encode is ", encodeResult)
-			err2, decodeResult := baseN.decode(encodeResult)
+			err2, decodeResult := baseN.Decode(encodeResult)
 			if err2 != nil {
 				t.Fail()
 			}else {

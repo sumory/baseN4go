@@ -14,7 +14,7 @@ var defaultBase = []string{
 	"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 
 const (
-	maxNum = math.MaxInt64 // int64(1<<63 - 1
+	maxNum = math.MaxInt64 // int64(1<<63 - 1)
 )
 
 type BaseN struct {
