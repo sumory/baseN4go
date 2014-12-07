@@ -15,7 +15,7 @@ go get github.com/sumory/baseN4go
 
 默认数组:
 
-```
+```go
 []string{
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
@@ -26,7 +26,7 @@ go get github.com/sumory/baseN4go
 
 取默认数组前N项作为基数
 
-```
+```go
 var N int64 = 16
 err, baseN := baseN4go.NewBaseN(N) //16进制
 _, encodeResult := baseN.Encode(123456)
@@ -35,7 +35,7 @@ _, decodeResult := baseN.Decode(encodeResult)
 
 自定义基数
 
-```
+```go
 err, baseN := baseN4go.NewBaseN([]string{"a", "b", "c", "d"}) //四进制
 _, encodeResult := baseN.Encode(123456)
 _, decodeResult := baseN.Decode(encodeResult)
