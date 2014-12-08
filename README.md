@@ -1,6 +1,6 @@
 ## baseN4go
 
-[![Build Status](https://travis-ci.org/sumory/baseN4go.svg?branch=master)](https://travis-ci.org/sumory/baseN4go) [![](http://gocover.io/_badge/github.com/sumory/baseN4go)](http://gocover.io/github.com/sumory/baseN4go)
+[![Build Status](https://travis-ci.org/sumory/baseN4go.svg?branch=master)](https://travis-ci.org/sumory/baseN4go) [![](http://gocover.io/_badge/github.com/sumory/baseN4go)](http://gocover.io/github.com/sumory/baseN4go) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/sumory/baseN4go/master/LICENSE)
 
 
 #### 介绍

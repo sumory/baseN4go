@@ -77,6 +77,13 @@ func TestRadix16_Stand(t *testing.T) {
 		})
 }
 
+func TestBasics(t *testing.T) {
+	convey.Convey("test basics", t, func() {
+			convey.So(len(defaultBase), convey.ShouldEqual, 62)
+			convey.So(maxNum, convey.ShouldEqual, 1<<63-1)
+		})
+}
+
 func TestConstructor(t *testing.T) {
 	convey.Convey("constructor should be right",t, func(){
 			err, _ := NewBaseN([]string{"a", "b", "c", "d"})
@@ -92,6 +99,13 @@ func TestConstructor(t *testing.T) {
 			convey.So(err, convey.ShouldBeNil)
 			err, _ = NewBaseN(int64(4))
 			convey.So(err, convey.ShouldBeNil)
+
+			err, baseN := NewBaseN(int(10))
+			convey.So(err, convey.ShouldBeNil)
+			convey.So(baseN,convey.ShouldNotBeNil)
+			convey.So(baseN.radix,convey.ShouldEqual,10)
+
+			convey.So(baseN,convey.ShouldHaveSameTypeAs,new(BaseN))
 		})
 
 	convey.Convey("constructor should be wrong",t, func(){
@@ -117,6 +131,8 @@ func TestConstructor(t *testing.T) {
 
 			err, _ = NewBaseN(int(63))
 			convey.So(err, convey.ShouldNotBeNil)
+			err, _ = NewBaseN(int(1))
+			convey.So(err, convey.ShouldNotBeNil)
 			err, _ = NewBaseN(int64(1))
 			convey.So(err, convey.ShouldNotBeNil)
 
@@ -128,6 +144,8 @@ func TestConstructor(t *testing.T) {
 			err, baseN = NewBaseN("abc")
 			convey.So(err, convey.ShouldNotBeNil)
 			convey.So(baseN,convey.ShouldBeNil)
+
+
 		})
 }
 
