@@ -150,4 +150,18 @@ func TestConstructor(t *testing.T) {
 }
 
 
+func TestNegative(t *testing.T) {
+	convey.Convey("test negative", t, func() {
+			err,baseN := NewBaseN(62)
+			err,encode := baseN.Encode(-10)
+			convey.So(err, convey.ShouldBeNil)
+			convey.So(encode, convey.ShouldEqual, "-a")
+
+			err,decode := baseN.Decode("-a")
+			convey.So(decode,convey.ShouldEqual,-10)
+
+			//			err,encode = baseN.Encode(1<<64)
+			//			convey.So(err,convey.ShouldNotBeNil)
+		})
+}
 
